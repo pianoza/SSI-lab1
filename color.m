@@ -3,15 +3,6 @@
 im = double(rgb2gray(imread('p1_images/color.tif')));
 %im = double(imread('p1_images/woman.tif'));
 %im = double(imread('p1_images/gantrycrane.png'));
-% if size(im, 3) > 1
-%     imc = zeros(size(im,1), size(im,2));
-%     for i = 1:size(im,1)
-%         for j = 1:size(im,2)
-%             imc(i, j) = norm([im(i,j,1) im(i,j,2) im(i,j,3)], 2);
-%         end;
-%     end;
-%     im = imc;
-% end;
 mean = zeros(1, size(im,3));
 queue = [];%zeros(10000, 2);
 seg = zeros(size(im, 1), size(im, 2));
@@ -24,7 +15,7 @@ for i = 1 : size(im, 1)
         if seg(i, j) == 0
            l = 1;
            r = 1;
-           mean = im(i, j);
+           mean(:) = im(i, j,:);
            queue(l, 1) = i;
            queue(l, 2) = j;
            n = 1;
@@ -35,13 +26,18 @@ for i = 1 : size(im, 1)
                yc = queue(l, 2);
                for k = 1 : size(dx, 2)
                    if xc+dx(k) > 0 && xc+dx(k) <= size(im, 1) && yc+dy(k) > 0 && yc+dy(k) <= size(im, 2)
-                       if seg(xc+dx(k), yc+dy(k)) == 0 && abs(im(xc+dx(k), yc+dy(k)) - (mean/n)) <= T
+                       tmp = zeros(1, size(im,3));
+                       tmp(:) = im(xc+dx(k), yc+dy(k), :);
+                       euclidean = norm(tmp(:) - (mean(:)/n), 2);
+                       if seg(xc+dx(k), yc+dy(k)) == 0 && euclidean <= T
                            r = r + 1;
                            queue(r, 1) = xc + dx(k);
                            queue(r, 2) = yc + dy(k);
                            seg(xc+dx(k), yc+dy(k)) = nR;
                            n = n + 1;
-                           mean = mean + im(xc+dx(k), yc+dy(k));
+                           tmp = zeros(1, size(im,3));
+                           tmp(:) = im(xc+dx(k), yc+dy(k), :);
+                           mean(:) = mean(:) + tmp(:);
                        end;
                    end;
                end;
