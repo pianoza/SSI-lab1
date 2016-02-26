@@ -1,17 +1,20 @@
-%im = double(imread('p1_images/coins.png'));
+im = double(imread('p1_images/coins.png'));
 %im = double(imread('p1_images/color.tif'));
-im = double(rgb2gray(imread('p1_images/color.tif')));
+%im = double(rgb2gray(imread('p1_images/color.tif')));
 %im = double(imread('p1_images/woman.tif'));
 %im = double(imread('p1_images/gantrycrane.png'));
-mean = zeros(1, size(im,3));
+[height, width, dim] = size(im);
+tic
+mean = zeros(1, dim);
 queue = [];%zeros(10000, 2);
-seg = zeros(size(im, 1), size(im, 2));
+seg = zeros(height, width);
 dx = [0, 1, 0, -1, 1, -1, 1, -1];
 dy = [-1, 0, 1, 0, 1, 1, -1, -1];
-T = 20.0; %threshold
+nN = size(dx, 2);
+T = 70.0; %threshold
 nR = 0; %number of regions
-for i = 1 : size(im, 1)
-    for j = 1 : size(im, 2)
+for i = 1 : height
+    for j = 1 : width
         if seg(i, j) == 0
            l = 1;
            r = 1;
@@ -24,18 +27,18 @@ for i = 1 : size(im, 1)
            while l <= r
                xc = queue(l, 1);
                yc = queue(l, 2);
-               for k = 1 : size(dx, 2)
-                   if xc+dx(k) > 0 && xc+dx(k) <= size(im, 1) && yc+dy(k) > 0 && yc+dy(k) <= size(im, 2)
-                       tmp = zeros(1, size(im,3));
+               for k = 1 : nN
+                   if xc+dx(k) > 0 && xc+dx(k) <= height && yc+dy(k) > 0 && yc+dy(k) <= width && seg(xc+dx(k), yc+dy(k)) == 0
+                       tmp = zeros(1, dim);
                        tmp(:) = im(xc+dx(k), yc+dy(k), :);
                        euclidean = norm(tmp(:) - (mean(:)/n), 2);
-                       if seg(xc+dx(k), yc+dy(k)) == 0 && euclidean <= T
+                       if euclidean <= T
                            r = r + 1;
                            queue(r, 1) = xc + dx(k);
                            queue(r, 2) = yc + dy(k);
                            seg(xc+dx(k), yc+dy(k)) = nR;
                            n = n + 1;
-                           tmp = zeros(1, size(im,3));
+                           tmp = zeros(1, dim);
                            tmp(:) = im(xc+dx(k), yc+dy(k), :);
                            mean(:) = mean(:) + tmp(:);
                        end;
@@ -46,4 +49,5 @@ for i = 1 : size(im, 1)
         end;
     end;
 end;
+toc
 figure, imagesc(seg), axis equal;

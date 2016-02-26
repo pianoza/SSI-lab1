@@ -3,16 +3,7 @@
 im = double(rgb2gray(imread('p1_images/color.tif')));
 %im = double(imread('p1_images/woman.tif'));
 %im = double(imread('p1_images/gantrycrane.png'));
-% if size(im, 3) > 1
-%     imc = zeros(size(im,1), size(im,2));
-%     for i = 1:size(im,1)
-%         for j = 1:size(im,2)
-%             imc(i, j) = norm([im(i,j,1) im(i,j,2) im(i,j,3)], 2);
-%         end;
-%     end;
-%     im = imc;
-% end;
-mean = zeros(1, size(im,3));
+tic
 queue = [];%zeros(10000, 2);
 seg = zeros(size(im, 1), size(im, 2));
 dx = [0, 1, 0, -1, 1, -1, 1, -1];
@@ -50,4 +41,5 @@ for i = 1 : size(im, 1)
         end;
     end;
 end;
+toc
 figure, imagesc(seg), axis equal;
