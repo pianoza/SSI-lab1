@@ -1,8 +1,14 @@
-function [seg, numberOfRegions] = regionGrowing ( Threshold, Neighborhood)
-    [filename, path] = uigetfile({'*.jpg;*.tif;*.png;*.gif','All Image Files';...
-        '*.*','All Files' },'Select a folder');
+%% Region growing segmentation function
+%  Input: threshold value (double), Neighborhood: 4 or 8 connectivity
+%  Output: segmented image, number of regions
+%
+function [seg, numberOfRegions] = regionGrowing (Image, Threshold, Neighborhood)
 
-    im = double (imread(strcat(path, filename)));
+%     [filename, path] = uigetfile({'*.jpg;*.tif;*.png;*.gif','All Image Files';...
+%         '*.*','All Files' },'Select a folder');
+
+%    im = double (imread(strcat(path, filename)));
+    im = Image;
     % Get the image dimensions
     [height, width, dim] = size(im);
     % Declare mean variable as an array with length dim:
@@ -17,7 +23,10 @@ function [seg, numberOfRegions] = regionGrowing ( Threshold, Neighborhood)
     dx = [0, 1, 0, -1, 1, -1, 1, -1];
     dy = [-1, 0, 1, 0, 1, 1, -1, -1];
     % 4 or 8 connectivity
-    nN = Neighborhood;
+    nN = 8;
+    if Neighborhood == 4 || Neighborhood == 8
+        nN = Neighborhood;
+    end;
     % Define the threshold
     T = Threshold;
     % Initial number of regions
